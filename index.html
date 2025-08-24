@@ -1,0 +1,252 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JFC-IT Scavenger Hunt</title>
+
+<!-- 📂 GitHub Repo Structure Guide:
+   Make sure your repo looks like this for the PDF to load:
+
+   your-repo/
+   ├── index.html               <-- this file
+   ├── protected_message.pdf    <-- place PDF here (same level as index.html)
+   └── (other files/folders)
+
+   ✅ If you put the PDF in a folder, update iframe src:
+   e.g., <iframe src="files/protected_message.pdf#view=fitH&zoom=100"></iframe>
+-->
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    font-family: 'Courier New', monospace;
+    color: #00ff66;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  .letter {
+    background: rgba(0, 0, 0, 0.75);
+    border: 2px solid #00ff66;
+    box-shadow: 0 0 20px #00ff66;
+    width: 85%;
+    max-width: 650px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 5vw;
+    animation: fadeIn 1s ease-in-out;
+    border-radius: 10px;
+  }
+
+  .typewriter-line {
+    display: block;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: clamp(14px, 2.5vw, 18px);
+    line-height: 1.5;
+    margin: 14px 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .continue-link, .back-btn {
+    display: block;
+    margin-top: 15px;
+    font-size: clamp(16px, 3vw, 20px);
+    color: #00aaff;
+    text-decoration: underline;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    opacity: 0;
+    transition: opacity 1s ease-in;
+    font-family: 'Courier New', monospace;
+  }
+
+  .continue-link.show, .back-btn.show {
+    opacity: 1;
+  }
+
+  /* PDF Viewer container */
+  .pdf-container {
+    margin-top: 20px;
+    border: 2px solid #00ff66;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 25px #00ff66;
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  iframe {
+    width: 100%;
+    height: 75vh;
+    border: none;
+    display: block;
+    background: black;
+  }
+
+  .pdf-header {
+    background: #00ff66;
+    color: black;
+    font-weight: bold;
+    padding: 8px;
+    text-align: center;
+    font-size: 15px;
+    border-bottom: 2px solid #00ff66;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<!-- First Box -->
+<div class="letter" id="box1">
+  <span class="typewriter-line" data-text="Greetings."></span>
+  <span class="typewriter-line" data-text="Few have the EYEs to SEE, fewer have the will to follow. WHAT we are looking for are not the curious. We are looking for the relentless. To find them, we have devised a test."></span>
+  <span class="typewriter-line" data-text="There is a clue hidden in this message."></span>
+  <span class="typewriter-line" data-text="Find it and you will find us."></span>
+  <span class="typewriter-line" data-text="Only the first to arrive will be remembered. There is no place for OTHERS. No consolation. The path ends for all but one."></span>
+  <span class="typewriter-line" data-text="For the one/group who CAN complete the path, Php 1,000 will change hands — crisp, counted, and enough to buy what hunger or habit demands."></span>
+  <span class="typewriter-line" data-text="Do NOT share what you find."></span>
+  <span class="typewriter-line" data-text="Pull the thread."></span>
+  <span class="typewriter-line" data-text="Watch the fabric tear."></span>
+
+ <span class="continue-link hidden" id="continueLink">Continue</span>
+</div>
+
+<!-- Second Box -->
+<div class="letter hidden" id="box2">
+  <p style="color:#ff6600;">I wait in silence, yet I lead the way. Unveil me, and the path obey.</p>
+  
+  <div class="pdf-container">
+    <div class="pdf-header">🔒 Encrypted File Viewer</div>
+    <!-- PDF must be in the same folder as index.html -->
+    <iframe src="protected_message.pdf#view=fitH&zoom=100"></iframe>
+  </div>
+
+  <button class="back-btn hidden" id="backBtn">Go Back</button>
+</div>
+
+<script>
+/* Binary Rain Background with random green shades */
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+}
+resizeCanvas();
+
+const letters = '01';
+const matrix = letters.split('');
+
+let fontSize = 14;
+let columns = canvas.width / fontSize;
+let drops = Array.from({ length: columns }).fill(1);
+
+function randomGreen() {
+  let g = Math.floor(128 + Math.random() * 127); 
+  return `rgb(0, ${g}, 0)`;
+}
+
+function draw() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.font = fontSize + 'px monospace';
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = matrix[Math.floor(Math.random() * matrix.length)];
+    ctx.fillStyle = randomGreen();
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+setInterval(draw, 33);
+
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    columns = canvas.width / fontSize;
+    drops = Array.from({ length: columns }).fill(1);
+});
+
+/* Typewriter effect per line */
+const lines = document.querySelectorAll('.typewriter-line');
+const continueLink = document.getElementById('continueLink');
+const backBtn = document.getElementById('backBtn');
+
+let lineIndex = 0;
+function typeLine() {
+  if (lineIndex >= lines.length) {
+    continueLink.classList.remove("hidden");
+    setTimeout(() => continueLink.classList.add("show"), 100);
+    return;
+  }
+  let el = lines[lineIndex];
+  let text = el.getAttribute("data-text");
+  let i = 0;
+  let interval = setInterval(() => {
+    el.textContent = text.slice(0, i);
+    i++;
+    if (i > text.length) {
+      clearInterval(interval);
+      lineIndex++;
+      setTimeout(typeLine, 50);
+    }
+  }, 6);
+}
+typeLine();
+
+/* Box switching */
+const box1 = document.getElementById('box1');
+const box2 = document.getElementById('box2');
+
+continueLink.addEventListener('click', () => {
+    box1.classList.add('hidden');
+    box2.classList.remove('hidden');
+    backBtn.classList.remove("hidden");
+    setTimeout(() => backBtn.classList.add("show"), 100);
+});
+
+backBtn.addEventListener('click', () => {
+    box2.classList.add('hidden');
+    box1.classList.remove('hidden');
+    lines.forEach(el => el.textContent = "");
+    lineIndex = 0;
+    continueLink.classList.add("hidden");
+    continueLink.classList.remove("show");
+    backBtn.classList.add("hidden");
+    backBtn.classList.remove("show");
+    typeLine();
+});
+</script>
+
+</body>
+</html>
