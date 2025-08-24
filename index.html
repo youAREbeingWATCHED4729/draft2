@@ -116,6 +116,16 @@
     border-bottom: 2px solid #00ff66;
     letter-spacing: 1px;
   }
+
+  .pdf-fallback {
+    text-align: center;
+    margin: 10px 0;
+  }
+  .pdf-fallback a {
+    color: #00aaff;
+    text-decoration: underline;
+    font-size: clamp(14px, 3vw, 16px);
+  }
 </style>
 </head>
 <body>
@@ -145,6 +155,11 @@
     <div class="pdf-header">🔒 Encrypted File Viewer</div>
     <!-- PDF must be in the same folder as index.html -->
     <iframe src="protected_message.pdf#view=fitH&zoom=100"></iframe>
+
+    <!-- fallback link for mobile/safari where PDF iframe might not load -->
+    <div class="pdf-fallback">
+      <a href="protected_message.pdf" target="_blank">📄 Open PDF directly</a>
+    </div>
   </div>
 
   <button class="back-btn hidden" id="backBtn">Go Back</button>
